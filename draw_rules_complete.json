@@ -1,0 +1,68 @@
+{
+  "description": "HVAA2026 complete draw rules by event type",
+  "same_category_only": true,
+  "event_types": {
+    "sprint_hurdle": {
+      "events": [
+        "60M",
+        "100M",
+        "200M",
+        "400M",
+        "100M欄",
+        "110M欄",
+        "400M欄"
+      ],
+      "sort_by": "eng_name A→Z",
+      "heat_size": 8,
+      "lane_assignment": {
+        "heats": "positional [4,5,3,6,2,7,1,8] by eng_name alpha order",
+        "final": "random draw within band — Top/Next/Last (see final_lane_rules.json)"
+      },
+      "format": "Heats & Final",
+      "final_lane_draw": "random within band (see final_lane_rules.json)"
+    },
+    "middle_dist": {
+      "events": [
+        "800M",
+        "1500M",
+        "3000M"
+      ],
+      "sort_by": "eng_name A→Z",
+      "heat_size": 12,
+      "lane_assignment": "none",
+      "format": "Final only (no heats)"
+    },
+    "jump": {
+      "events": [
+        "跳高",
+        "跳遠",
+        "三級跳"
+      ],
+      "sort_by": "eng_name A→Z",
+      "heat_size": "none (all in one group)",
+      "lane_assignment": "none",
+      "format": "Final only"
+    },
+    "throw": {
+      "events": [
+        "鉛球",
+        "鐵餅",
+        "標槍"
+      ],
+      "sort_by": "eng_name A→Z",
+      "heat_size": "none (all in one group)",
+      "lane_assignment": "none",
+      "format": "Final only"
+    },
+    "relay": {
+      "events": [
+        "4x100M",
+        "4x400M"
+      ],
+      "sort_by": "school/club name A→Z",
+      "heat_size": 8,
+      "lane_assignment": "positional [4,5,3,6,2,7,1,8] by school alpha order",
+      "format": "Final only"
+    }
+  }
+}

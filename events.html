@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - HVAA2026</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:"Segoe UI",system-ui,sans-serif; background:#f0f4ff; color:#1a1a2e; min-height:100vh; }
+
+    /* NAV */
+    header { background:#fff; border-bottom:3px solid #4f46e5; position:fixed; width:100%; top:0; z-index:1000; box-shadow:0 2px 12px rgba(79,70,229,.10); }
+    .nav-inner { max-width:1300px; margin:0 auto; display:flex; align-items:center; padding:0 1.5rem; }
+    .nav-logo { font-size:1.25rem; font-weight:800; color:#4f46e5; letter-spacing:1px; padding:.9rem 0; margin-right:2rem; white-space:nowrap; }
+    nav ul { list-style:none; display:flex; flex-wrap:wrap; }
+    nav a { color:#444; text-decoration:none; padding:.9rem 1.1rem; font-weight:600; font-size:.92rem; display:block; border-bottom:3px solid transparent; transition:all .2s; margin-bottom:-3px; }
+    nav a:hover { color:#4f46e5; border-bottom-color:#a5b4fc; }
+    nav a.active { color:#4f46e5; border-bottom-color:#4f46e5; }
+
+    main { padding-top:72px; padding-bottom:3rem; }
+
+    /* HERO */
+    .page-hero { background:linear-gradient(120deg,#4f46e5 0%,#7c3aed 50%,#ec4899 100%); color:white; padding:2.5rem 1.5rem 2rem; text-align:center; position:relative; overflow:hidden; }
+    .page-hero::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 70% 50%,rgba(255,255,255,.08),transparent 70%); }
+    .hero-icon { font-size:2.8rem; margin-bottom:.4rem; display:block; position:relative; }
+    .page-hero h1 { font-size:2rem; font-weight:800; letter-spacing:2px; position:relative; }
+    .page-hero p  { font-size:.95rem; opacity:.88; margin-top:.4rem; position:relative; }
+
+    /* STAT STRIP */
+    .stat-strip { max-width:1300px; margin:1.2rem auto; padding:0 1.2rem; display:flex; gap:.8rem; flex-wrap:wrap; justify-content:center; }
+    .stat-card { background:white; border-radius:12px; padding:.9rem 1.8rem; text-align:center; min-width:130px; flex:1; max-width:200px; box-shadow:0 2px 10px rgba(79,70,229,.08); border:1px solid #e0e7ff; }
+    .stat-card .num { font-size:1.8rem; font-weight:800; color:#4f46e5; line-height:1; }
+    .stat-card .lbl { font-size:.72rem; color:#6b7280; text-transform:uppercase; letter-spacing:.5px; margin-top:.25rem; }
+
+    /* CONTROLS */
+    .controls { max-width:1300px; margin:0 auto .8rem; padding:.85rem 1.2rem; background:white; border-radius:12px; display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; box-shadow:0 2px 10px rgba(79,70,229,.08); border:1px solid #e0e7ff; }
+    .controls input, .controls select { padding:.5rem .85rem; border:1.5px solid #c7d2fe; border-radius:8px; font-size:.88rem; background:#f8f9ff; color:#1a1a2e; }
+    .controls input:focus,.controls select:focus { outline:none; border-color:#4f46e5; background:#fff; }
+    .controls input { flex:1; min-width:200px; }
+    .controls select { min-width:170px; }
+    .count-badge { margin-left:auto; font-size:.85rem; color:#6366f1; font-weight:600; white-space:nowrap; }
+
+    /* BUTTONS */
+    .btn { padding:.48rem 1.1rem; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-size:.88rem; transition:all .2s; }
+    .btn-primary { background:#4f46e5; color:white; }
+    .btn-primary:hover { background:#4338ca; }
+    .btn-accent  { background:#ec4899; color:white; }
+    .btn-accent:hover { background:#db2777; }
+    .btn-outline { background:white; color:#4f46e5; border:1.5px solid #c7d2fe; }
+    .btn-outline:hover { background:#eef2ff; }
+
+    /* CATEGORY TABS */
+    .cat-tabs { max-width:1300px; margin:1rem auto .5rem; padding:0 1.2rem; display:flex; gap:.4rem; flex-wrap:wrap; }
+    .cat-tab { padding:.4rem .9rem; border-radius:20px; border:1.5px solid #c7d2fe; background:white; color:#4f46e5; font-weight:700; font-size:.82rem; cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .cat-tab:hover { background:#eef2ff; }
+    .cat-tab.active { background:#4f46e5; color:white; border-color:#4f46e5; }
+    .cat-tab.girl-tab { border-color:#fbcfe8; color:#be185d; }
+    .cat-tab.girl-tab:hover { background:#fdf2f8; }
+    .cat-tab.girl-tab.active { background:#ec4899; color:white; border-color:#ec4899; }
+
+    /* EVENT TYPE FILTER */
+    .type-tabs { max-width:1300px; margin:0 auto .8rem; padding:0 1.2rem; display:flex; gap:.4rem; flex-wrap:wrap; }
+    .type-tab { padding:.35rem .8rem; border-radius:8px; border:1.5px solid #e0e7ff; background:white; font-weight:600; font-size:.8rem; cursor:pointer; transition:all .2s; }
+    .type-tab:hover { background:#f5f3ff; }
+    .type-tab.active { background:#7c3aed; color:white; border-color:#7c3aed; }
+
+    /* EVENTS GRID */
+    .events-wrap { max-width:1300px; margin:0 auto; padding:0 1.2rem; display:flex; flex-direction:column; gap:1rem; }
+
+    /* EVENT CARD */
+    .event-card { background:white; border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(79,70,229,.08); border:1px solid #e0e7ff; }
+    .event-header { padding:.85rem 1.2rem; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:filter .2s; }
+    .event-header:hover { filter:brightness(.97); }
+    .event-header.sprint { background:linear-gradient(90deg,#4f46e5,#6366f1); color:white; }
+    .event-header.middle { background:linear-gradient(90deg,#0891b2,#06b6d4); color:white; }
+    .event-header.jump   { background:linear-gradient(90deg,#059669,#10b981); color:white; }
+    .event-header.throw  { background:linear-gradient(90deg,#d97706,#f59e0b); color:white; }
+    .event-header.relay  { background:linear-gradient(90deg,#dc2626,#ef4444); color:white; }
+
+    .event-title { display:flex; align-items:center; gap:.6rem; }
+    .event-name  { font-size:1.05rem; font-weight:800; letter-spacing:.5px; }
+    .event-icon  { font-size:1.3rem; }
+    .event-meta  { display:flex; gap:.6rem; align-items:center; font-size:.82rem; opacity:.92; }
+    .badge-pill  { background:rgba(255,255,255,.22); padding:.18rem .65rem; border-radius:20px; font-weight:700; white-space:nowrap; }
+    .toggle-arrow { font-size:1rem; transition:transform .25s; display:inline-block; }
+    .event-card.collapsed .toggle-arrow { transform:rotate(-90deg); }
+
+    .event-body { overflow:hidden; transition:max-height .3s ease; }
+    .event-card.collapsed .event-body { max-height:0 !important; }
+
+    /* HEAT BLOCK */
+    .heat-block { border-top:1px solid #f0f0ff; padding:1rem 1.2rem; }
+    .heat-title { font-weight:700; font-size:.88rem; color:#4338ca; margin-bottom:.6rem; display:flex; align-items:center; gap:.5rem; }
+    .heat-title span { background:#eef2ff; padding:.15rem .55rem; border-radius:6px; }
+
+    /* START LIST TABLE */
+    table.start-list { width:100%; border-collapse:collapse; font-size:.88rem; }
+    table.start-list th { background:#f5f3ff; color:#4338ca; padding:.55rem .7rem; text-align:left; font-size:.75rem; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid #e0e7ff; white-space:nowrap; }
+    table.start-list td { padding:.55rem .7rem; border-bottom:1px solid #f0f0ff; vertical-align:middle; }
+    table.start-list tr:last-child td { border-bottom:none; }
+    table.start-list tr:hover td { background:#fafaff; }
+
+    .lane-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#4f46e5; color:white; font-weight:800; font-size:.82rem; }
+    .order-badge { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; background:#e0e7ff; color:#3730a3; font-weight:800; font-size:.82rem; }
+    .bib { display:inline-block; font-weight:800; font-size:.8rem; padding:.18rem .55rem; border-radius:6px; color:white; letter-spacing:1px; }
+    .bib-B { background:linear-gradient(135deg,#3b82f6,#2563eb); }
+    .bib-G { background:linear-gradient(135deg,#ec4899,#db2777); }
+    .ev-pill { display:inline-block; background:#e0e7ff; color:#3730a3; font-size:.73rem; padding:.12rem .45rem; border-radius:20px; font-weight:700; }
+
+    /* FINAL DRAW SECTION */
+    .final-section { border-top:2px dashed #c7d2fe; padding:1rem 1.2rem; background:#fafaff; }
+    .final-title { font-weight:700; font-size:.88rem; color:#7c3aed; margin-bottom:.8rem; display:flex; align-items:center; gap:.5rem; }
+    .draw-btn { padding:.38rem .9rem; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-size:.82rem; background:#7c3aed; color:white; transition:all .2s; margin-left:auto; }
+    .draw-btn:hover { background:#6d28d9; }
+    .band-top  td { background:#fffbeb !important; }
+    .band-next td { background:#f0fdf4 !important; }
+    .band-last td { background:#fdf2f8 !important; }
+    .band-label { display:inline-block; font-size:.72rem; padding:.1rem .4rem; border-radius:4px; font-weight:700; }
+    .band-top-l  { background:#fef3c7; color:#92400e; }
+    .band-next-l { background:#d1fae5; color:#065f46; }
+    .band-last-l { background:#fce7f3; color:#9d174d; }
+
+    /* NO DATA */
+    .no-data { text-align:center; padding:2rem; color:#9ca3af; font-size:.9rem; }
+
+    /* ACTION BAR */
+    .action-bar { max-width:1300px; margin:0 auto .6rem; padding:0 1.2rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+
+    @media(max-width:768px){
+      .nav-inner { flex-wrap:wrap; }
+      .nav-logo { margin-right:auto; }
+      nav ul { width:100%; overflow-x:auto; }
+      nav a { padding:.6rem .8rem; font-size:.85rem; }
+      table.start-list th,table.start-list td { font-size:.78rem; padding:.45rem .5rem; }
+      .event-name { font-size:.92rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <span class="nav-logo">HVAA<span style="color:#ec4899">2026</span></span>
+    <nav><ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="entry-list.html">📋 Entry List</a></li>
+      <li><a href="athletes.html">🏃 Athletes</a></li>
+      <li><a href="events.html" class="active">🏁 Events</a></li>
+      <li><a href="school-club.html">🏫 School / Club</a></li>
+    </ul></nav>
+  </div>
+</header>
+
+<main>
+  <div class="page-hero">
+    <span class="hero-icon">🏁</span>
+    <h1>Events</h1>
+    <p>132 events &mdash; heat draws, lane assignments &amp; start lists by category</p>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat-card"><div class="num">132</div><div class="lbl">Total Events</div></div>
+    <div class="stat-card"><div class="num">12</div><div class="lbl">Categories</div></div>
+    <div class="stat-card"><div class="num" id="statAthletes">—</div><div class="lbl">Athletes Loaded</div></div>
+    <div class="stat-card"><div class="num" id="statEntries">—</div><div class="lbl">Event Entries</div></div>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="cat-tabs" id="catTabs"></div>
+
+  <!-- Event Type Filter -->
+  <div class="type-tabs">
+    <button class="type-tab active" data-type="all">All Types</button>
+    <button class="type-tab" data-type="sprint">🏃 Sprint / Hurdle</button>
+    <button class="type-tab" data-type="middle">🔵 Middle Dist</button>
+    <button class="type-tab" data-type="jump">🦘 Jump</button>
+    <button class="type-tab" data-type="throw">🎯 Throw</button>
+    <button class="type-tab" data-type="relay">🤝 Relay</button>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-outline" onclick="expandAll()">Expand All</button>
+    <button class="btn btn-outline" onclick="collapseAll()">Collapse All</button>
+    <span class="count-badge" id="eventCount"></span>
+  </div>
+
+  <div class="events-wrap" id="eventsWrap">
+    <p class="no-data">Loading event data…</p>
+  </div>
+</main>
+
+<script>
+// ── Data & constants ─────────────────────────────────────────────────────────
+const CAT_ORDER  = ['BA','BB','BC','BD','BE','BF','GA','GB','GC','GD','GE','GF'];
+const CAT_LABELS = {BA:'男子U20',BB:'男子U18',BC:'男子U16',BD:'男子U14',BE:'男子U12',BF:'男子U10',
+                    GA:'女子U20',GB:'女子U18',GC:'女子U16',GD:'女子U14',GE:'女子U12',GF:'女子U10'};
+const EV_ICONS   = {sprint:'🏃',middle:'🔵',jump:'🦘',throw:'🎯',relay:'🤝'};
+const LANE_ORDER = [4,5,3,6,2,7,1,8];
+
+// Final lane bands
+const FINAL_BANDS = {
+  '60M':    {top:[3,4,5,6],next:[7,8],last:[1,2],topN:4,nextN:6},
+  '100M':   {top:[3,4,5,6],next:[7,8],last:[1,2],topN:4,nextN:6},
+  '100M欄': {top:[3,4,5,6],next:[7,8],last:[1,2],topN:4,nextN:6},
+  '110M欄': {top:[3,4,5,6],next:[7,8],last:[1,2],topN:4,nextN:6},
+  '200M':   {top:[5,6,7],next:[3,4,8],last:[1,2],topN:3,nextN:6},
+  '400M':   {top:[4,5,6,7],next:[3,8],last:[1,2],topN:4,nextN:6},
+  '400M欄': {top:[4,5,6,7],next:[3,8],last:[1,2],topN:4,nextN:6},
+};
+
+let eventsData = {}, athletesData = [], currentCat = 'BA', currentType = 'all';
+
+// ── Load data ────────────────────────────────────────────────────────────────
+Promise.all([
+  fetch('events_page_data.json').then(r=>r.json()),
+  fetch('athletes_table.json').then(r=>r.json())
+]).then(([evData, athData]) => {
+  eventsData  = evData.events;
+  athletesData = athData.data;
+  document.getElementById('statAthletes').textContent = athletesData.length;
+  const totalEntries = athletesData.reduce((s,a)=>s+[a.Event_1,a.Event_2,a.Event_3].filter(e=>e&&e.trim()).length,0);
+  document.getElementById('statEntries').textContent = totalEntries;
+  buildCatTabs();
+  renderEvents();
+}).catch(()=>{
+  document.getElementById('eventsWrap').innerHTML='<p class="no-data">⚠️ Place <strong>events_page_data.json</strong> and <strong>athletes_table.json</strong> in site root.</p>';
+});
+
+// ── Category Tabs ─────────────────────────────────────────────────────────────
+function buildCatTabs(){
+  const wrap = document.getElementById('catTabs');
+  CAT_ORDER.forEach(code => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-tab' + (code.startsWith('G')?' girl-tab':'') + (code===currentCat?' active':'');
+    btn.textContent = `${code} ${CAT_LABELS[code]}`;
+    btn.onclick = () => { currentCat=code; document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderEvents(); };
+    wrap.appendChild(btn);
+  });
+}
+
+// ── Type Tabs ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.type-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentType = btn.dataset.type;
+    document.querySelectorAll('.type-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderEvents();
+  });
+});
+
+// ── Main render ───────────────────────────────────────────────────────────────
+function renderEvents(){
+  const catEvents = (eventsData[currentCat]||[]).filter(e => currentType==='all' || e.type===currentType);
+  document.getElementById('eventCount').textContent = `${catEvents.length} event${catEvents.length!==1?'s':''} · ${CAT_LABELS[currentCat]}`;
+
+  if(!catEvents.length){
+    document.getElementById('eventsWrap').innerHTML='<p class="no-data">No events for this selection.</p>';
+    return;
+  }
+
+  const html = catEvents.map(e => buildEventCard(e, currentCat)).join('');
+  document.getElementById('eventsWrap').innerHTML = html;
+
+  // Attach toggle listeners
+  document.querySelectorAll('.event-header').forEach(h => {
+    h.addEventListener('click', () => h.closest('.event-card').classList.toggle('collapsed'));
+  });
+}
+
+// ── Build one event card ──────────────────────────────────────────────────────
+function buildEventCard(evObj, catCode){
+  const { event, type, format, heat_size } = evObj;
+  const icon = EV_ICONS[type]||'🏅';
+  const isGirl = catCode.startsWith('G');
+  const bibClass = isGirl ? 'bib-G' : 'bib-B';
+
+  // Get athletes for this category × event
+  const athletes = getAthletes(catCode, event);
+  const count = athletes.length;
+
+  // Format pills
+  const formatPill = `<span class="badge-pill">${format}</span>`;
+  const heatPill   = heat_size ? `<span class="badge-pill">Max ${heat_size}/heat</span>` : '';
+  const countPill  = `<span class="badge-pill">${count} athlete${count!==1?'s':''}</span>`;
+
+  // Build body content
+  let bodyHtml = '';
+
+  if(type === 'sprint'){
+    bodyHtml = buildSprintBody(event, athletes, bibClass);
+  } else if(type === 'middle'){
+    bodyHtml = buildMiddleBody(event, athletes, bibClass);
+  } else if(type === 'jump' || type === 'throw'){
+    bodyHtml = buildFieldBody(event, athletes, bibClass);
+  } else if(type === 'relay'){
+    bodyHtml = buildRelayBody(event, catCode, athletes, bibClass);
+  }
+
+  const estHeight = Math.max(count * 48 + 120, 100);
+
+  return `
+  <div class="event-card" id="ev-${catCode}-${event.replace(/[^a-z0-9]/gi,'_')}">
+    <div class="event-header ${type}">
+      <div class="event-title">
+        <span class="event-icon">${icon}</span>
+        <span class="event-name">${event}</span>
+      </div>
+      <div class="event-meta">
+        ${formatPill}${heatPill}${countPill}
+        <span class="toggle-arrow">▾</span>
+      </div>
+    </div>
+    <div class="event-body" style="max-height:${estHeight}px">
+      ${bodyHtml || '<div class="no-data">No entries yet for this event.</div>'}
+    </div>
+  </div>`;
+}
+
+// ── Get athletes for a category × event ───────────────────────────────────────
+function getAthletes(catCode, event){
+  const results = [];
+  athletesData.forEach(a => {
+    if(a.Cat_Code !== catCode) return;
+    [a.Event_1, a.Event_2, a.Event_3].forEach(e => {
+      if(e && e.trim() === event){
+        results.push({ bib:a.Bib, eng:a.Eng_name, chi:a.Chinese_name, school:a.School_Club, cat:a.Category, catCode:a.Cat_Code });
+      }
+    });
+  });
+  return results;
+}
+
+// ── Sprint / Hurdle: heats with lanes + final draw section ────────────────────
+function buildSprintBody(event, athletes, bibClass){
+  if(!athletes.length) return '<div class="no-data">No entries.</div>';
+
+  // Sort A→Z by eng name, split into heats of 8
+  const sorted = [...athletes].sort((a,b)=>a.eng.localeCompare(b.eng));
+  const nHeats = Math.ceil(sorted.length / 8);
+  let html = '';
+
+  for(let h=0; h<nHeats; h++){
+    const heat = sorted.slice(h*8, (h+1)*8);
+    html += `<div class="heat-block">
+      <div class="heat-title">🔥 <span>Heat ${h+1} of ${nHeats}</span> &nbsp; Lanes assigned by A→Z order</div>
+      <table class="start-list">
+        <thead><tr><th>Lane</th><th>Bib</th><th>Eng Name</th><th>Chinese Name</th><th>School / Club</th></tr></thead>
+        <tbody>
+          ${heat.map((a,i) => {
+            const lane = LANE_ORDER[i];
+            return `<tr>
+              <td><span class="lane-badge">${lane}</span></td>
+              <td><span class="bib ${bibClass}">${a.bib}</span></td>
+              <td>${a.eng}</td><td>${a.chi}</td><td>${a.school}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  // Final lane draw section
+  const bands = FINAL_BANDS[event];
+  const bandInfo = bands ?
+    `Top (Rank 1–${bands.topN}) → Lanes {${bands.top.join(',')}} &nbsp;|&nbsp; Next (${bands.topN+1}–${bands.nextN}) → {${bands.next.join(',')}} &nbsp;|&nbsp; Last → {${bands.last.join(',')}}` :
+    'See draw rules';
+
+  const drawId = 'draw-' + event.replace(/[^a-z0-9]/gi,'_') + '-' + Math.random().toString(36).slice(2,6);
+
+  html += `<div class="final-section">
+    <div class="final-title">
+      🎰 Final Lane Draw &nbsp;
+      <small style="font-weight:400;opacity:.8">${bandInfo}</small>
+      <button class="draw-btn" onclick="runFinalDraw('${event}','${bibClass}','${drawId}')">🎲 Draw Lanes</button>
+    </div>
+    <div id="${drawId}">
+      <p style="color:#9ca3af;font-size:.85rem;padding:.5rem 0">Enter heat results then click <strong>Draw Lanes</strong> to assign final lanes by random draw within band.</p>
+      ${buildFinalInputTable(athletes, bibClass, drawId)}
+    </div>
+  </div>`;
+
+  return html;
+}
+
+function buildFinalInputTable(athletes, bibClass, drawId){
+  // Top 8 qualifier slots with time input
+  const slots = Math.min(athletes.length, 8);
+  let rows = '';
+  const sorted = [...athletes].sort((a,b)=>a.eng.localeCompare(b.eng)).slice(0, slots);
+  rows = sorted.map((a,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><span class="bib ${bibClass}">${a.bib}</span></td>
+      <td>${a.eng}</td><td>${a.school}</td>
+      <td><input type="text" placeholder="e.g. 11.23" style="width:80px;padding:.3rem .5rem;border:1.5px solid #c7d2fe;border-radius:6px;font-size:.85rem" data-bib="${a.bib}" data-eng="${a.eng}" data-chi="${a.chi}" data-school="${a.school}" data-bibclass="${bibClass}"></td>
+    </tr>`).join('');
+  return `<table class="start-list" id="input-${drawId}">
+    <thead><tr><th>Qual Rank</th><th>Bib</th><th>Eng Name</th><th>School</th><th>Heat Time</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function runFinalDraw(event, bibClass, drawId){
+  const bands = FINAL_BANDS[event];
+  if(!bands){ alert('No final lane rules for this event.'); return; }
+
+  // Read qualifiers from inputs
+  const inputs = document.querySelectorAll(`#input-${drawId} input`);
+  const qualifiers = Array.from(inputs).map((inp,i)=>({
+    rank: i+1,
+    bib: inp.dataset.bib,
+    eng: inp.dataset.eng,
+    chi: inp.dataset.chi,
+    school: inp.dataset.school,
+    bibClass: inp.dataset.bibclass,
+    time: inp.value || '—'
+  }));
+
+  // Split into bands
+  const top  = qualifiers.slice(0, bands.topN);
+  const next = qualifiers.slice(bands.topN, bands.nextN);
+  const last = qualifiers.slice(bands.nextN);
+
+  // Random draw within each band
+  const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+  const topLanes  = shuffle([...bands.top]).slice(0, top.length);
+  const nextLanes = shuffle([...bands.next]).slice(0, next.length);
+  const lastLanes = shuffle([...bands.last]).slice(0, last.length);
+
+  const assigned = [
+    ...top.map((a,i)=>({...a,lane:topLanes[i],band:'Top'})),
+    ...next.map((a,i)=>({...a,lane:nextLanes[i],band:'Next'})),
+    ...last.map((a,i)=>({...a,lane:lastLanes[i],band:'Last'})),
+  ].sort((a,b)=>a.lane-b.lane);
+
+  const bandClass = {Top:'band-top',Next:'band-next',Last:'band-last'};
+  const bandLabelClass = {Top:'band-top-l',Next:'band-next-l',Last:'band-last-l'};
+
+  const rows = assigned.map(a=>`<tr class="${bandClass[a.band]}">
+    <td><span class="lane-badge" style="background:${a.band==='Top'?'#f59e0b':a.band==='Next'?'#10b981':'#ec4899'}">${a.lane}</span></td>
+    <td><span class="bib ${a.bibClass}">${a.bib}</span></td>
+    <td>${a.eng}</td><td>${a.school}</td>
+    <td>${a.time}</td>
+    <td><span class="band-label ${bandLabelClass[a.band]}">${a.band}</span></td>
+  </tr>`).join('');
+
+  document.getElementById(drawId).innerHTML = `
+    <table class="start-list">
+      <thead><tr><th>Lane</th><th>Bib</th><th>Eng Name</th><th>School</th><th>Heat Time</th><th>Band</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:.6rem;text-align:right">
+      <button class="btn btn-outline" style="font-size:.8rem" onclick="location.reload()">↺ Reset Draw</button>
+    </div>`;
+}
+
+// ── Middle Distance: heats of 12, no lanes ─────────────────────────────────────
+function buildMiddleBody(event, athletes, bibClass){
+  if(!athletes.length) return '<div class="no-data">No entries.</div>';
+  const sorted = [...athletes].sort((a,b)=>a.eng.localeCompare(b.eng));
+  const nHeats = Math.ceil(sorted.length / 12);
+  let html = '';
+  for(let h=0; h<nHeats; h++){
+    const heat = sorted.slice(h*12,(h+1)*12);
+    html += `<div class="heat-block">
+      <div class="heat-title">🔵 <span>Heat ${h+1} of ${nHeats}</span> &nbsp; No lanes — mass start</div>
+      <table class="start-list">
+        <thead><tr><th>Order</th><th>Bib</th><th>Eng Name</th><th>Chinese Name</th><th>School / Club</th></tr></thead>
+        <tbody>${heat.map((a,i)=>`<tr>
+          <td><span class="order-badge">${h*12+i+1}</span></td>
+          <td><span class="bib ${bibClass}">${a.bib}</span></td>
+          <td>${a.eng}</td><td>${a.chi}</td><td>${a.school}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+  return html;
+}
+
+// ── Jump / Throw: all in order, no heats ──────────────────────────────────────
+function buildFieldBody(event, athletes, bibClass){
+  if(!athletes.length) return '<div class="no-data">No entries.</div>';
+  const sorted = [...athletes].sort((a,b)=>a.eng.localeCompare(b.eng));
+  return `<div class="heat-block">
+    <div class="heat-title">📋 <span>Competition Order</span> &nbsp; Sorted A→Z · All attempt together</div>
+    <table class="start-list">
+      <thead><tr><th>Order</th><th>Bib</th><th>Eng Name</th><th>Chinese Name</th><th>School / Club</th></tr></thead>
+      <tbody>${sorted.map((a,i)=>`<tr>
+        <td><span class="order-badge">${i+1}</span></td>
+        <td><span class="bib ${bibClass}">${a.bib}</span></td>
+        <td>${a.eng}</td><td>${a.chi}</td><td>${a.school}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+// ── Relay: heats of 8 by school A→Z ──────────────────────────────────────────
+function buildRelayBody(event, catCode, athletes, bibClass){
+  // Get unique schools for this category from athletes table
+  const schools = [...new Set(
+    athletesData.filter(a=>a.Cat_Code===catCode).map(a=>a.School_Club)
+  )].sort();
+
+  if(!schools.length) return '<div class="no-data">No teams entered.</div>';
+  const nHeats = Math.ceil(schools.length / 8);
+  let html = '';
+
+  for(let h=0; h<nHeats; h++){
+    const heat = schools.slice(h*8,(h+1)*8);
+    html += `<div class="heat-block">
+      <div class="heat-title">🤝 <span>Heat ${h+1} of ${nHeats}</span> &nbsp; Lanes by School A→Z</div>
+      <table class="start-list">
+        <thead><tr><th>Lane</th><th>School / Club</th><th>Athletes</th></tr></thead>
+        <tbody>${heat.map((school,i)=>{
+          const lane = LANE_ORDER[i];
+          const teamAthletes = athletesData.filter(a=>a.Cat_Code===catCode&&a.School_Club===school);
+          const bibs = teamAthletes.map(a=>`<span class="bib ${bibClass}" style="font-size:.7rem;padding:.1rem .4rem">${a.Bib}</span>`).join(' ');
+          return `<tr>
+            <td><span class="lane-badge">${lane}</span></td>
+            <td><strong>${school}</strong></td>
+            <td>${bibs||'—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+  return html;
+}
+
+// ── Expand / Collapse all ─────────────────────────────────────────────────────
+function expandAll()  { document.querySelectorAll('.event-card').forEach(c=>c.classList.remove('collapsed')); }
+function collapseAll(){ document.querySelectorAll('.event-card').forEach(c=>c.classList.add('collapsed')); }
+</script>
+</body>
+</html>
