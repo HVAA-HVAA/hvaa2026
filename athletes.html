@@ -282,6 +282,7 @@
     <p>One row per athlete &mdash; sorted by Category &rarr; School/Club &mdash; Bib auto-assigned</p>
   </div>
 
+  <div id="debug-info" style="display:none;max-width:1300px;margin:.5rem auto;padding:.7rem 1.2rem;background:#fef3c7;border:1.5px solid #fbbf24;border-radius:10px;font-size:.85rem;color:#92400e"></div>
   <div class="controls">
     <input type="text" id="search" placeholder="🔍  Search name, Bib, HKAAA no…">
     <select id="catFilter"><option value="">All Categories</option></select>
@@ -314,8 +315,30 @@ const CAT_ORDER=['BA','BB','BC','BD','BE','BF','GA','GB','GC','GD','GE','GF'];
 const PAGE=100; let allData=[],filtered=[],currentPage=1,sortKey='',sortAsc=true;
 
 fetch('athletes_table.json').then(r=>r.json()).then(res=>{
-  allData=res.data; populateFilters(); applyFilters();
-}).catch(()=>document.getElementById('tbody').innerHTML='<tr><td colspan="10" style="text-align:center;padding:2rem;color:#9ca3af">Place <strong>athletes_table.json</strong> in site root.</td></tr>');
+  allData=res.data; 
+  // Debug: show first record info
+  if(allData.length > 0){
+    const r0 = allData[0];
+    const debugEl = document.getElementById('debug-info');
+    if(debugEl){
+      debugEl.style.display='block';
+      debugEl.innerHTML = '<strong>✅ JSON loaded: ' + allData.length + ' records</strong><br>' +
+        'First record keys: ' + Object.keys(r0).join(', ') + '<br>' +
+        'Sample — Eng_name: <em>' + (r0.Eng_name||'MISSING') + '</em> | ' +
+        'Cat_Code: <em>' + (r0.Cat_Code||'MISSING') + '</em> | ' +
+        'Bib: <em>' + (r0.Bib||'MISSING') + '</em> | ' +
+        'Category: <em>' + (r0.Category||'MISSING') + '</em>';
+    }
+  }
+  populateFilters(); applyFilters();
+}).catch((err)=>{
+  document.getElementById('tbody').innerHTML=`<tr><td colspan="10" style="text-align:center;padding:2rem;color:#991b1b">
+    <strong>⚠️ Could not load athletes_table.json</strong><br>
+    <span style="font-size:.85rem;color:#6b7280">Error: ${err.message}</span><br>
+    <span style="font-size:.85rem;color:#6b7280">Try opening: <a href="athletes_table.json" target="_blank">athletes_table.json</a> directly — if it loads, try a hard refresh (Ctrl+Shift+R / Cmd+Shift+R)</span>
+  </td></tr>`;
+  console.error('athletes_table.json load error:', err);
+});
 
 function populateFilters(){
   const cats=[...new Set(allData.map(d=>d.Category))].sort((a,b)=>{
